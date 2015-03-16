@@ -18,6 +18,7 @@ class WebhooksPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IConfigurer)
     plugins.implements(plugins.IDomainObjectModification, inherit=True)
     plugins.implements(plugins.IActions, inherit=True)
+    plugins.implements(plugins.IRoutes, inherit=True)
 
     # IConfigurer
     def update_config(self, config_):
@@ -60,6 +61,15 @@ class WebhooksPlugin(plugins.SingletonPlugin):
             'webhook_show': actions.webhook_show
         }
         return actions_dict
+
+    def before_map(self, map):
+        controller = 'ckanext.webhooks.controllers:WebhookController'
+        map.connect('/ckan-admin/webhooks',
+                    controller=controller, action='index')
+        return map
+
+    def after_map(self, map):
+        return map
 
     #Notification functions be here
     def _notify_hooks(self, entity, context, topic):
